@@ -6,7 +6,13 @@ Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 
   namespace :api, defaults: { format: :json }, constraints: { subdomain: 'api' }, path: '/'  do
-    namespace :v1, path: '/', constraints: ApiVersionConstraint.new(version: 1, default: true) do
+    namespace :v1, path: '/', constraints: ApiVersionConstraint.new(version: 1) do
+      resources :users, only: [:show, :create, :update, :destroy]
+      resources :sessions, only: [:create, :destroy]
+      resources :tasks, only: [:index, :show, :create, :update, :destroy]
+    end
+
+    namespace :v2, path: '/', constraints: ApiVersionConstraint.new(version: 2, default: true) do
       resources :users, only: [:show, :create, :update, :destroy]
       resources :sessions, only: [:create, :destroy]
       resources :tasks, only: [:index, :show, :create, :update, :destroy]
