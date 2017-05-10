@@ -14,17 +14,37 @@ RSpec.describe 'Task API' do
 
 
   describe 'GET /tasks' do
-    before do
-      create_list(:task, 5, user_id: user.id)
-      get '/tasks', params: {}, headers: headers
+    context 'when no filter param is sent' do
+      before do
+        create_list(:task, 5, user_id: user.id)
+        get '/tasks', params: {}, headers: headers
+      end
+
+      it 'returns status code 200' do
+        expect(response).to have_http_status(200)
+      end
+
+      it 'returns 5 tasks from database' do
+        expect(json_body[:data].count).to eq(5)
+      end      
     end
 
-    it 'returns status code 200' do
-      expect(response).to have_http_status(200)
-    end
 
-    it 'returns 5 tasks from database' do
-      expect(json_body[:data].count).to eq(5)
+    context 'when filter params is sent' do
+      let!(:notebook_task_1) { create(:task, title: 'Check if the notebook is broken', user_id: user.id) }
+      let!(:notebook_task_2) { create(:task, title: 'Buy a new notebook', user_id: user.id) }
+      let!(:other_task_1) { create(:task, title: 'Fix the door', user_id: user.id) }
+      let!(:other_task_2) { create(:task, title: 'Buy a new car', user_id: user.id) }
+
+      before do
+        get '/tasks?q[title_cont]=note', params: {}, headers: headers
+      end
+
+      it 'returns only the tasks matching' do
+        returned_task_titles = json_body[:data].map { |t| t[:attributes][:title] }
+
+        expect(returned_task_titles).to eq([notebook_task_1.title, notebook_task_2.title])
+      end
     end
   end
 

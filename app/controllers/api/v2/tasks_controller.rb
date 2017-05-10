@@ -2,7 +2,7 @@ class Api::V2::TasksController < ApplicationController
   before_action :authenticate_with_token!
 
   def index
-		tasks = current_user.tasks
+		tasks = current_user.tasks.ransack(params[:q]).result
 		render json: tasks, status: 200
   end
 
