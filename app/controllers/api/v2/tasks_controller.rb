@@ -1,4 +1,4 @@
-class Api::V2::TasksController < ApplicationController
+class Api::V2::TasksController < Api::V2::BaseController
   before_action :authenticate_with_token!
 
   def index
